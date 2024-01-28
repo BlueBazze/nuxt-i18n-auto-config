@@ -1,6 +1,5 @@
 {
-    "i18n-ally.localesPaths": [
-        "playground/locales",
-        "playground/config/locales"
-    ]
+  "i18n-ally.namespace": false,
+  "i18n-ally.pathMatcher": "{locale}/{namespace}.{ext}",
+  "i18n-ally.localesPaths": ["playground/locales"]
 }

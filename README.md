@@ -27,7 +27,7 @@ export default defineProjectLocale({
 });
 ```
 
-Havent figured out how i can auto import the `defineProjectLocale` function. \
+Havent figured out how it can auto import the `defineProjectLocale` function.
 
 
 <!-- - [✨ &nbsp;Release Notes](/CHANGELOG.md) -->
