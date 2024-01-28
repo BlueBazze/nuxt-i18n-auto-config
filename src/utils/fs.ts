@@ -1,17 +1,15 @@
-import { resolvePath } from "@nuxt/kit";
-import { globbySync } from "globby";
-import type { ModuleOptions } from "../types";
+import { resolvePath, resolveFiles } from "@nuxt/kit";
 
 /**
  *
  * @param path Relative to user project root
  * @returns Array of paths for files in @param path
  */
-export async function getFilesInPath(path: string) {
-  const localeFiles = globbySync(
+export async function getFilesInPath(path: string, pattern: string) {
+  const localeFiles = await resolveFiles(
     // Path relative to user project root.
-    await resolvePath(path)
-    // `${options.localeDefinitionsPath}/*.ts`
+    await resolvePath(path),
+    pattern
   );
   return localeFiles;
 }

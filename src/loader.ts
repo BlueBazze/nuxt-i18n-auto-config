@@ -15,7 +15,8 @@ export async function loadLocales(options: ModuleOptions) {
     pathFiller(options.expressions.localeDefinition, {
       exp: PATH_LOCALE_DEFINITION_PATH_MATCHER,
       value: options.paths.localeDefinitionsPath,
-    })
+    }),
+    "*.ts"
   );
 
   if (localeFiles.length === 0) {
@@ -48,7 +49,8 @@ async function computedDefinitions(
           exp: PATH_LOCALE_MATCHER,
           value: _def.code,
         },
-      ])
+      ]),
+      "*.json"
     );
 
     _def.files = files;

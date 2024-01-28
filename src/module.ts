@@ -1,18 +1,11 @@
 import {
-  defineNuxtModule,
-  addPlugin,
   createResolver,
-  resolvePath,
+  defineNuxtModule,
   hasNuxtModule,
   useLogger,
-  addImports,
-  addImportsDir,
-  addServerImportsDir,
 } from "@nuxt/kit";
-import { convertPathToPattern, globbySync } from "globby";
-import type { ModuleOptions } from "./types";
 import { loadLocales } from "./loader";
-import { COMPOSABLE_DEFINE_PROJECT_LOCALE } from "./constants";
+import type { ModuleOptions } from "./types";
 
 // Module options TypeScript interface definition
 
@@ -32,8 +25,8 @@ export default defineNuxtModule<ModuleOptions>({
       localesPath: "locales",
     },
     expressions: {
-      localeDefinition: "{localeDefinitionsPath}/*.ts",
-      locales: "{localesPath}/{locale}/*.json",
+      localeDefinition: "{localeDefinitionsPath}/",
+      locales: "{localesPath}/{locale}/",
     },
   },
   async setup(options, nuxt) {
