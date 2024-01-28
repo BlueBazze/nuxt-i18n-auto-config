@@ -6,6 +6,6 @@ export interface ModuleOptions {
 
   expressions: {
     localeDefinition: string;
-locales: string
-  }
+    locales: string;
+  };
 }
