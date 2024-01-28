@@ -23,31 +23,28 @@ My new Nuxt module for doing amazing things.
 ## Features
 
 <!-- Highlight some of the features your module provide here -->
-- ⛰ &nbsp;Foo
-- 🚠 &nbsp;Bar
-- 🌲 &nbsp;Baz
+- Auto loading locale files
+- namespaced files [wip]
 
 ## Quick Setup
+0. Install [`@nuxtjs/i18n`](https://i18n.nuxtjs.org/getting-started/setup)
 
-1. Add `my-module` dependency to your project
+1. Add `nuxt-i18n-auto-config` dependency to your project
 
 ```bash
-# Using pnpm
-pnpm add -D my-module
-
-# Using yarn
-yarn add --dev my-module
-
 # Using npm
 npm install --save-dev my-module
+
+...
 ```
 
-2. Add `my-module` to the `modules` section of `nuxt.config.ts`
+2. Add `nuxt-i18n-auto-config` to the `modules` section of `nuxt.config.ts`, before `@nuxtjs/i18n`. Reason mentioned [here](https://i18n.nuxtjs.org/guide/extend-messages)
 
 ```js
 export default defineNuxtConfig({
   modules: [
-    'my-module'
+    'nuxt-i18n-auto-config',
+    '@nuxtjs/i18n'
   ]
 })
 ```
