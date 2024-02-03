@@ -1,5 +1,3 @@
-import type { I18nOptions } from "vue-i18n";
-
 /**
  * From vue-i18n-routing
  */

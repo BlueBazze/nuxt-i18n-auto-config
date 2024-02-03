@@ -74,7 +74,7 @@ export default defineNuxtModule<ModuleOptions>({
         );
       }
 
-      console.log("localeDefinitions", JSON.stringify(localeDefinitions));
+      // console.log("localeDefinitions", JSON.stringify(localeDefinitions));
 
       register({
         langDir: resolver.resolve(`${options.paths.localesPath}`),
