@@ -21,9 +21,20 @@ A language definition looks like
 import { defineProjectLocale } from "nuxt-i18n-auto-config/runtime/composables";
 
 export default defineProjectLocale({
-  code: "en",
-  iso: "en",
-  name: "English",
+  locale: { code: "en", iso: "en", name: "English" },
+  datetimeFormats: {
+    short: {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    },
+  },
+  numberFormats: {
+    currency: {
+      style: "currency",
+      currency: "USD",
+    },
+  },
 });
 ```
 
@@ -39,11 +50,15 @@ Havent figured out how it can auto import the `defineProjectLocale` function.
 <!-- Highlight some of the features your module provide here -->
 
 - Auto loading locale files
+- Datetime & Number format
 
 ### Planned
 
 - Namespaced files
-- Datetime & Number format
+
+### Maybe
+
+- Output locale messages to build dir
 
 ## Config
 

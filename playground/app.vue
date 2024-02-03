@@ -5,6 +5,9 @@
     {{ $t("welcome") }}
     <br />
     {{ messages }}
+    <br />
+    <br />
+    <CurrencyDisplay />
   </div>
 </template>
 

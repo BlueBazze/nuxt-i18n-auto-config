@@ -3,8 +3,10 @@ import {
   defineNuxtModule,
   hasNuxtModule,
   useLogger,
+  addTemplate,
+  addTypeTemplate,
 } from "@nuxt/kit";
-import { loadLocales } from "./loader";
+import { GenerateTemplate, GenerateTypeTemplate, loadLocales } from "./loader";
 import type { ModuleOptions } from "./types";
 
 // Module options TypeScript interface definition
@@ -41,6 +43,24 @@ export default defineNuxtModule<ModuleOptions>({
       }
     });
 
+    addTemplate({
+      filename: "i18n.auto-config.mjs",
+      write: true,
+      getContents: GenerateTemplate,
+      options,
+      // getContents(data) {
+      //   console.log(Object.keys(data));
+      //   return "";
+      // },
+    });
+
+    addTypeTemplate({
+      filename: "i18n.auto-config.d.ts",
+      write: true,
+      getContents: GenerateTypeTemplate,
+      options,
+    });
+
     // @ts-ignore stfu
     nuxt.hook("i18n:registerModule", async (register) => {
       const localeDefinitions = await loadLocales(options);
@@ -54,9 +74,11 @@ export default defineNuxtModule<ModuleOptions>({
         );
       }
 
+      console.log("localeDefinitions", JSON.stringify(localeDefinitions));
+
       register({
         langDir: resolver.resolve(`${options.paths.localesPath}`),
-        locales: localeDefinitions,
+        locales: localeDefinitions.map((locale) => locale.locale),
       });
     });
   },

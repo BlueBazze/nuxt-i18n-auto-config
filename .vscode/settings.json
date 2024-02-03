@@ -1,5 +1,6 @@
 {
   "i18n-ally.namespace": false,
   "i18n-ally.pathMatcher": "{locale}/{namespace}.{ext}",
-  "i18n-ally.localesPaths": ["playground/locales"]
+  "i18n-ally.localesPaths": ["playground/locales"],
+  "typescript.tsdk": "node_modules/typescript/lib"
 }

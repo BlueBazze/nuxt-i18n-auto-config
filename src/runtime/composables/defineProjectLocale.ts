@@ -1,3 +1,5 @@
+import type { I18nOptions } from "vue-i18n";
+
 /**
  * From vue-i18n-routing
  */
@@ -11,10 +13,30 @@ interface LocaleObject {
   iso?: string;
 }
 
-interface ProjectLocale extends LocaleObject {}
+export interface ComputedLocaleObject extends LocaleObject {
+  files: string[];
+}
+
+export interface ProjectLocale {
+  locale: LocaleObject;
+  // @ts-ignore
+  datetimeFormats: import("#build/i18n.auto-config.d.ts").DatetimeFormats;
+  // @ts-ignore
+  numberFormats: import("#build/i18n.auto-config.d.ts").NumberFormats;
+}
+
+// const ll: ProjectLocale = {
+//   datetimeFormats: {
+//     // ss: {
+
+//     // }
+//   }
+// }
+
+export interface InternalProjectLocale extends ProjectLocale {
+  locale: ComputedLocaleObject;
+}
 
 export function defineProjectLocale(config: ProjectLocale) {
-  // TODO: generate the locale file paths
-
   return config;
 }
