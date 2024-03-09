@@ -5,9 +5,16 @@ import {
   useLogger,
   addTemplate,
   addTypeTemplate,
+  addImportsDir,
 } from "@nuxt/kit";
-import { GenerateTemplate, GenerateTypeTemplate, loadLocales } from "./loader";
+import {
+  GenerateTemplate,
+  GenerateTypeTemplate,
+  computedDefinitions,
+  loadLocales,
+} from "./loader";
 import type { ModuleOptions } from "./types";
+import { TemplateGenerator } from "./generator";
 
 // Module options TypeScript interface definition
 
@@ -61,25 +68,49 @@ export default defineNuxtModule<ModuleOptions>({
       options,
     });
 
+    addTemplate({
+      filename: "i18n.mine.mjs",
+      write: true,
+      getContents: TemplateGenerator,
+      options,
+    });
+
+    addImportsDir("./runtime/composables");
+
+    nuxt.hook("app:templates", () => {
+      console.log("app:templates");
+    });
+
+    nuxt.hook("app:templatesGenerated", () => {
+      console.log("app:templatesGenerated");
+    });
+
+    nuxt.hook("builder:watch", () => {
+      console.log("builder:watch");
+    });
+
     // @ts-ignore stfu
     nuxt.hook("i18n:registerModule", async (register) => {
-      const localeDefinitions = await loadLocales(options);
-      if (!localeDefinitions) return;
-
-      if (nuxt.options.dev) {
-        logger.debug(
-          `Found locales: ${JSON.stringify(
-            localeDefinitions.map((_def: any) => _def.code)
-          )}`
-        );
-      }
-
-      // console.log("localeDefinitions", JSON.stringify(localeDefinitions));
-
-      register({
-        langDir: resolver.resolve(`${options.paths.localesPath}`),
-        locales: localeDefinitions.map((locale) => locale.locale),
-      });
+      // const localeDefinitions = await loadLocales(options);
+      // if (!localeDefinitions) return;
+      // @ts-ignore
+      // const sourceLocales = await import("#build/i18n.mine.mjs");
+      // const localeDefinitions = await computedDefinitions(
+      //   Object.values(sourceLocales),
+      //   options
+      // );
+      // if (nuxt.options.dev) {
+      //   logger.debug(
+      //     `Found locales: ${JSON.stringify(
+      //       localeDefinitions.map((_def: any) => _def.code)
+      //     )}`
+      //   );
+      // }
+      // // console.log("localeDefinitions", JSON.stringify(localeDefinitions));
+      // register({
+      //   langDir: resolver.resolve(`${options.paths.localesPath}`),
+      //   locales: localeDefinitions.map((locale) => locale.locale),
+      // });
     });
   },
 });

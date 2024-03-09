@@ -1,6 +1,9 @@
 import { resolvePath, resolveFiles } from "@nuxt/kit";
 import { PATH_LOCALE_DEFINITION_PATH_MATCHER } from "../constants";
 import type { ModuleOptions } from "../types";
+import { readFileSync as _readFileSync } from "node:fs";
+import { transform as stripType } from "sucrase";
+import { parse as ParseCode } from "@babel/parser";
 
 /**
  *
@@ -50,6 +53,14 @@ export async function getDefaultContentsOfFiles<T>(
   return contents;
 }
 
+
+
+// const code = readCode(_file, ".ts");
+// const parsed = ParseCode(code, {
+//   allowImportExportEverywhere: true,
+//   sourceType: "module",
+// });
+
 interface IPathMatcher {
   exp: RegExp;
   value: string;
@@ -75,4 +86,21 @@ export function getLocaleDefinitionsPath(options: ModuleOptions): string {
     exp: PATH_LOCALE_DEFINITION_PATH_MATCHER,
     value: options.paths.localeDefinitionsPath,
   });
+}
+
+export function readCode(absolutePath: string, ext: string) {
+  let code = readFileSync(absolutePath);
+  if ([".ts"].includes(ext)) {
+    // @ts-ignore
+    const out = stripType(code, {
+      transforms: ["typescript", "jsx"],
+      keepUnusedImports: true,
+    });
+    // @ts-ignore
+    code = out.code;
+  }
+  return code;
+}
+export function readFileSync(path: string) {
+  return _readFileSync(path, { encoding: "utf-8" });
 }

@@ -40,7 +40,7 @@ export async function loadLocales(options: ModuleOptions) {
   return computedLocales;
 }
 
-async function computedDefinitions(
+export async function computedDefinitions(
   localeDefinitions: any,
   options: ModuleOptions
 ) {

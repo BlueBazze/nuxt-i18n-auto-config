@@ -1,3 +1,5 @@
+import { Locales } from "./.nuxt/i18n.mine.mjs";
+
 export default defineNuxtConfig({
   modules: ["../src/module", "@nuxtjs/i18n"],
 
@@ -30,5 +32,9 @@ export default defineNuxtConfig({
       redirectOn: "root", // recommended
     },
     vueI18n: "i18n.options.ts",
+    // locales: Locales,
+    // locales: [
+    //   {}
+    // ]
   },
 });
