@@ -1,3 +1,5 @@
+import type { LocaleObject } from "@nuxtjs/i18n/dist/runtime/composables";
+import { locales } from "./.nuxt/i18n.auto-config.mjs";
 import { Locales } from "./.nuxt/i18n.mine.mjs";
 
 export default defineNuxtConfig({
@@ -31,7 +33,10 @@ export default defineNuxtConfig({
       cookieKey: "i18n_redirected",
       redirectOn: "root", // recommended
     },
+    debug: true,
     vueI18n: "i18n.options.ts",
+    locales: locales,
+    // i18nModules:
     // locales: Locales,
     // locales: [
     //   {}

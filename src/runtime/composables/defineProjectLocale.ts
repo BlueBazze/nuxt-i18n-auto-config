@@ -7,6 +7,7 @@ interface LocaleObject {
   dir?: any; // Directions;
   domain?: string;
   file?: string;
+  files?: string[];
   isCatchallLocale?: boolean;
   iso?: string;
 }

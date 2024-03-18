@@ -5,6 +5,7 @@
     {{ $t("welcome") }}
     <br />
     {{ messages }}
+    {{ locale }}
     <br />
     <br />
     <CurrencyDisplay />
@@ -12,7 +13,7 @@
 </template>
 
 <script setup>
-const { messages } = useI18n();
+const { messages,locale } = useI18n();
 </script>
 
 <style>

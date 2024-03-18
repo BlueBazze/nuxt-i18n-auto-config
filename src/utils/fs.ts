@@ -22,7 +22,7 @@ export async function getFilesInPath(
   return localeFiles;
 }
 
-type FileContent<T> = { content: T; path: string };
+export type FileContent<T> = { content: T; path: string };
 
 /**
  * Reads all the files given and returns their default exports

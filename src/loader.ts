@@ -15,8 +15,10 @@ import {
   getFilesInPath,
   getLocaleDefinitionsPath,
   pathFiller,
+  type FileContent,
 } from "./utils/fs";
 import { relative } from "pathe";
+import type { LocaleObject } from "@nuxtjs/i18n/dist/runtime/composables";
 
 export async function loadLocales(options: ModuleOptions) {
   const localeFiles = await getFilesInPath(
@@ -41,30 +43,33 @@ export async function loadLocales(options: ModuleOptions) {
 }
 
 export async function computedDefinitions(
-  localeDefinitions: any,
+  localeDefinitions: FileContent<ProjectLocale>[],
   options: ModuleOptions
 ) {
-  const promises = localeDefinitions.map(async (_def: any) => {
-    const files = await getFilesInPath(
-      pathFiller(options.expressions.locales, [
-        {
-          exp: PATH_LOCALE_DEFINITION_PATH_MATCHER,
-          value: options.paths.localeDefinitionsPath,
-        },
-        {
-          exp: PATH_LOCALES_PATH_MATCHER,
-          value: options.paths.localesPath,
-        },
-        {
-          exp: PATH_LOCALE_MATCHER,
-          value: _def.locale.code,
-        },
-      ]),
-      "*.json"
-    );
-    _def.locale.files = files;
-    return _def;
-  });
+  const promises = localeDefinitions.map(
+    async (_def: FileContent<ProjectLocale>) => {
+      console.log("Fails", _def.content);
+      const files = await getFilesInPath(
+        pathFiller(options.expressions.locales, [
+          {
+            exp: PATH_LOCALE_DEFINITION_PATH_MATCHER,
+            value: options.paths.localeDefinitionsPath,
+          },
+          {
+            exp: PATH_LOCALES_PATH_MATCHER,
+            value: options.paths.localesPath,
+          },
+          {
+            exp: PATH_LOCALE_MATCHER,
+            value: _def.content.locale.code,
+          },
+        ]),
+        "*.json"
+      );
+      _def.content.locale.files = files;
+      return _def;
+    }
+  );
   const updatedLocaleDefinitions = await Promise.all(promises);
 
   return updatedLocaleDefinitions;
@@ -82,10 +87,15 @@ export async function GenerateTemplate(data: {
     "*.ts"
   );
 
-  const locales = await getDefaultContentsOfFiles<ProjectLocale>(
+  const localeDefinitions = await getDefaultContentsOfFiles<ProjectLocale>(
     localeFiles,
     true
   );
+
+  console.log("REEEEEE");
+
+  const locales = await computedDefinitions(localeDefinitions, data.options);
+  console.log("Generator", JSON.stringify(locales));
 
   return `
 ${locales
@@ -104,9 +114,18 @@ export const localeCodes = [${locales
     .map((locale: (typeof locales)[0]) => `"${locale.content.locale.code}"`)
     .join(", ")}];
 
-export const locales = [${locales
-    .map((locale: (typeof locales)[0]) => locale.content.locale.code)
-    .join(", ")}];
+export const locales = [
+${locales
+  .map((locale: (typeof locales)[0]) => {
+    console.log("REEEEEEEEEEEEEEEEEEA", locale.content.locale.files);
+    return `{
+  ...${locale.content.locale.code + ".locale"},
+  files: [${locale.content.locale.files?.map(
+    (file) => `"${file}"` // ``
+  )}]
+}`;
+  })
+  .join(", ")}];
 
 export const datetimeFormats = {
   ${locales
