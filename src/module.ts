@@ -114,3 +114,5 @@ export default defineNuxtModule<ModuleOptions>({
     });
   },
 });
+
+export { defineProjectLocale } from "./runtime/composables/defineProjectLocale";
