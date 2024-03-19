@@ -1,6 +1,5 @@
 import type { LocaleObject } from "@nuxtjs/i18n/dist/runtime/composables";
 import { locales } from "./.nuxt/i18n.auto-config.mjs";
-import { Locales } from "./.nuxt/i18n.mine.mjs";
 
 export default defineNuxtConfig({
   modules: ["../src/module", "@nuxtjs/i18n"],

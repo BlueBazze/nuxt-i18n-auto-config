@@ -42,8 +42,6 @@ export async function TemplateGenerator(data: {
 
   const codes = localeFiles.map((file) => readCode(file, ".ts"));
 
-  console.log(codes);
-
   const dynamicImports = generateDynamicImports(relativePaths);
 
   const computedLocales = await Promise.all(

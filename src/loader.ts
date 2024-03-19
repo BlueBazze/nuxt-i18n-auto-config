@@ -14,10 +14,11 @@ import {
   getDefaultContentsOfFiles,
   getFilesInPath,
   getLocaleDefinitionsPath,
+  getTranslationFilesPath,
   pathFiller,
   type FileContent,
 } from "./utils/fs";
-import { relative } from "pathe";
+import { join, relative, basename } from "pathe";
 import type { LocaleObject } from "@nuxtjs/i18n/dist/runtime/composables";
 
 export async function loadLocales(options: ModuleOptions) {
@@ -33,46 +34,31 @@ export async function loadLocales(options: ModuleOptions) {
   const localeDefinitions = await getDefaultContentsOfFiles<ProjectLocale>(
     localeFiles
   );
-  // console.log(JSON.stringify(localeDefinitions));
 
-  const computedLocales = await computedDefinitions(localeDefinitions, options);
-
-  // console.log(JSON.stringify(computedLocales));
+  const computedLocales = await getTranslationFilesList(
+    localeDefinitions,
+    options
+  );
 
   return computedLocales;
 }
 
-export async function computedDefinitions(
-  localeDefinitions: FileContent<ProjectLocale>[],
+export async function getTranslationFilesList(
+  cwd: string,
+  codes: { [code: string]: string[] },
   options: ModuleOptions
 ) {
-  const promises = localeDefinitions.map(
-    async (_def: FileContent<ProjectLocale>) => {
-      console.log("Fails", _def.content);
-      const files = await getFilesInPath(
-        pathFiller(options.expressions.locales, [
-          {
-            exp: PATH_LOCALE_DEFINITION_PATH_MATCHER,
-            value: options.paths.localeDefinitionsPath,
-          },
-          {
-            exp: PATH_LOCALES_PATH_MATCHER,
-            value: options.paths.localesPath,
-          },
-          {
-            exp: PATH_LOCALE_MATCHER,
-            value: _def.content.locale.code,
-          },
-        ]),
-        "*.json"
-      );
-      _def.content.locale.files = files;
-      return _def;
-    }
-  );
-  const updatedLocaleDefinitions = await Promise.all(promises);
+  const promises = Object.keys(codes).map(async (_code: string) => {
+    const files = await getFilesInPath(
+      getTranslationFilesPath(_code, cwd, options),
+      "*.json"
+    );
+    codes[_code] = files;
+    return { [_code]: files };
+  });
+  const updatedTranslationFilesList = await Promise.all(promises);
 
-  return updatedLocaleDefinitions;
+  return updatedTranslationFilesList.reduce((a, b) => ({ ...a, ...b }), {});
 }
 
 export async function GenerateTemplate(data: {
@@ -82,70 +68,122 @@ export async function GenerateTemplate(data: {
 }): Promise<string> {
   // const locales = await loadLocales(options);
 
-  const localeFiles = await getFilesInPath(
-    getLocaleDefinitionsPath(data.options),
-    "*.ts"
-  );
+  const localeFiles: { [key: string]: string } = {};
+  // Singular layer for locale
+  for (const layer of data.nuxt.options._layers || []) {
+    // You can check for a custom directory existence to extend for each layer
+    const _localeFiles = await getFilesInPath(
+      getLocaleDefinitionsPath(layer.cwd, data.options),
+      "*.ts"
+    );
 
-  const localeDefinitions = await getDefaultContentsOfFiles<ProjectLocale>(
-    localeFiles,
-    true
-  );
+    if (_localeFiles.length > 0) {
+      _localeFiles.forEach((file) => {
+        // If filename already exists dont append it
+        const _bn = basename(file).replace(".ts", "");
+        if (!localeFiles[_bn]) {
+          localeFiles[_bn] = file;
+        }
+      });
+    }
+  }
 
-  console.log("REEEEEE");
+  const locales: { [key: string]: string[] } = {};
 
-  const locales = await computedDefinitions(localeDefinitions, data.options);
-  console.log("Generator", JSON.stringify(locales));
+  // const locales = await getTranslationFilesList(
+  //   Object.keys(localeFiles)
+  //     .map((key) => ({ [key]: [] as string[] }))
+  //     .reduce((a, b) => ({ ...a, ...b }), {}),
+  //   data.options
+  // );
+  for (const layer of data.nuxt.options._layers || []) {
+    // You can check for a custom directory existence to extend for each layer
+    const _layerLocales = await getTranslationFilesList(
+      layer.cwd,
+      Object.keys(localeFiles)
+        .map((key) => ({ [key]: [] as string[] }))
+        .reduce((a, b) => ({ ...a, ...b }), {}),
+      data.options
+    );
 
+    if(Object.keys(_layerLocales).length > 0) {
+      Object.keys(_layerLocales).forEach((key) => {
+        if (!locales[key]) {
+          locales[key] = [];
+        }
+        locales[key].push(..._layerLocales[key]);
+      });
+    }
+  }
+  
+
+  // localeFiles = await getFilesInPath(
+  //   getLocaleDefinitionsPath(data.options),
+  //   "*.ts"
+  // );
+
+  /**
+   * SINGULAR braincelled me thinking that i need to read the file contents
+   * ...
+   * INSTEAD OF THE FILE NAME!
+   */
+
+  // const localeDefinitions = await getDefaultContentsOfFiles<ProjectLocale>(
+  //   Object.values(localeFiles),
+  //   true
+  // );
+
+  // console.log("localeDefinitions", localeDefinitions);
+
+  // ${locales
+  //   .map(
+  //     (locale: (typeof locales)[0]) =>
+  //       `import ${locale.content.locale.code} from "${relative(
+  //         data.nuxt.options.buildDir,
+  //         locale.path
+  //       )}"`
+  //   )
+  //   .join(";\n")}
   return `
-${locales
-  .map(
-    (locale: (typeof locales)[0]) =>
-      `import ${locale.content.locale.code} from "${relative(
-        data.nuxt.options.buildDir,
-        locale.path
-      )}"`
-  )
-  .join(";\n")}
-
-
-
-export const localeCodes = [${locales
-    .map((locale: (typeof locales)[0]) => `"${locale.content.locale.code}"`)
-    .join(", ")}];
-
-export const locales = [
-${locales
-  .map((locale: (typeof locales)[0]) => {
-    console.log("REEEEEEEEEEEEEEEEEEA", locale.content.locale.files);
-    return `{
-  ...${locale.content.locale.code + ".locale"},
-  files: [${locale.content.locale.files?.map(
-    (file) => `"${file}"` // ``
-  )}]
-}`;
+const imports = {
+${Object.entries(localeFiles)
+  .map(([key, value]) => {
+    return `${key}: () => import("${relative(
+      data.nuxt.options.buildDir,
+      value
+    )}")()`;
   })
-  .join(", ")}];
+  .join(",\n")}
+}
+
+export const localeCodes = [${Object.keys(locales).map((key) => `"${key}"`)}];
+export const locales = [
+${Object.entries(locales)
+  .map(([key, value]) => {
+    return `
+  {
+    code: "${key}",
+    ...imports.${key},
+    files: [${value.map((file) => `"${file}"`).join(", ")}]
+  }
+  `;
+  })
+  .join(",\n\t")}
+]
 
 export const datetimeFormats = {
-  ${locales
-    .map((locale: (typeof locales)[0]) => {
-      return locale.content.datetimeFormats
-        ? `"${locale.content.locale.code}": ${locale.content.locale.code}.datetimeFormats`
-        : false;
+  ${Object.entries(locales)
+    .map(([key]) => {
+      return `${key}: imports.${key}.datetimeFormats`;
     })
-    .filter((val) => val !== false)
     .join(",\n\t")}
 }
 
 export const numberFormats = {
-  ${locales
-    .map((locale: (typeof locales)[0]) => {
-      return locale.content.numberFormats !== undefined
-        ? `"${locale.content.locale.code}": ${locale.content.locale.code}.numberFormats`
-        : false;
+  ${Object.keys(locales)
+    .map((key) => {
+      return `${key}: imports.${key}.numberFormats`;
     })
-    .filter((val) => val !== false)
     .join(",\n\t")}
 }
   `;
@@ -159,7 +197,7 @@ export async function GenerateTypeTemplate(data: {
   // const locales = await loadLocales(options);
 
   const localeFiles = await getFilesInPath(
-    getLocaleDefinitionsPath(data.options),
+    getLocaleDefinitionsPath(data.app.dir, data.options),
     "*.ts"
   );
 

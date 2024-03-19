@@ -1,9 +1,14 @@
-import { resolvePath, resolveFiles } from "@nuxt/kit";
-import { PATH_LOCALE_DEFINITION_PATH_MATCHER } from "../constants";
+import { resolvePath, resolveFiles, nuxtCtx } from "@nuxt/kit";
+import {
+  PATH_LOCALES_PATH_MATCHER,
+  PATH_LOCALE_DEFINITION_PATH_MATCHER,
+  PATH_LOCALE_MATCHER,
+} from "../constants";
 import type { ModuleOptions } from "../types";
 import { readFileSync as _readFileSync } from "node:fs";
 import { transform as stripType } from "sucrase";
 import { parse as ParseCode } from "@babel/parser";
+import { join } from "pathe";
 
 /**
  *
@@ -46,14 +51,27 @@ export async function getDefaultContentsOfFiles<T>(
 ): Promise<(FileContent<T> | T)[]> {
   const contents = await Promise.all(
     files.map(async (_file) => {
-      const { default: content } = await import(_file);
+      const { default: content } = await import(_file).catch((e) => {
+        console.error("Error reading file", _file, e);
+
+        // Try importing the typescript file into this js file
+        // @ts-ignore
+        const code = readCode(_file, ".ts");
+        // @ts-ignore
+        const parsed = ParseCode(code, {
+          allowImportExportEverywhere: true,
+          sourceType: "module",
+        });
+
+        // return evaluated code as a mask for import/export
+        // @ts-ignore
+        return eval(code);
+      });
       return withPath ? { content, path: _file } : content;
     })
   );
   return contents;
 }
-
-
 
 // const code = readCode(_file, ".ts");
 // const parsed = ParseCode(code, {
@@ -81,11 +99,35 @@ export function pathFiller(
   return path;
 }
 
-export function getLocaleDefinitionsPath(options: ModuleOptions): string {
+export function getLocaleDefinitionsPath(
+  cwd: string,
+  options: ModuleOptions
+): string {
   return pathFiller(options.expressions.localeDefinition, {
     exp: PATH_LOCALE_DEFINITION_PATH_MATCHER,
-    value: options.paths.localeDefinitionsPath,
+    value: join(cwd, options.paths.localeDefinitionsPath),
   });
+}
+
+export function getTranslationFilesPath(
+  code: string,
+  cwd: string,
+  options: ModuleOptions
+): string {
+  return pathFiller(options.expressions.locales, [
+    {
+      exp: PATH_LOCALE_DEFINITION_PATH_MATCHER,
+      value: join(cwd, options.paths.localeDefinitionsPath),
+    },
+    {
+      exp: PATH_LOCALES_PATH_MATCHER,
+      value: join(cwd, options.paths.localesPath),
+    },
+    {
+      exp: PATH_LOCALE_MATCHER,
+      value: code,
+    },
+  ]);
 }
 
 export function readCode(absolutePath: string, ext: string) {

@@ -49,8 +49,9 @@ Havent figured out how it can auto import the `defineProjectLocale` function.
 
 <!-- Highlight some of the features your module provide here -->
 
-- Auto loading locale files
+- Auto discovering locale files
 - Datetime & Number format
+- Singular layer for locale
 
 ### Planned
 
@@ -58,7 +59,8 @@ Havent figured out how it can auto import the `defineProjectLocale` function.
 
 ### Maybe
 
-- Output locale messages to build dir
+- Output locale messages to build dir(for namespaced files)
+- Multiple layers merging
 
 ## Config
 

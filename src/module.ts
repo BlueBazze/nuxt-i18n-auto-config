@@ -6,11 +6,12 @@ import {
   addTemplate,
   addTypeTemplate,
   addImportsDir,
+  addImports,
 } from "@nuxt/kit";
 import {
   GenerateTemplate,
   GenerateTypeTemplate,
-  computedDefinitions,
+  getTranslationFilesList,
   loadLocales,
 } from "./loader";
 import type { ModuleOptions } from "./types";
@@ -42,6 +43,11 @@ export default defineNuxtModule<ModuleOptions>({
     const resolver = createResolver(import.meta.url);
     const logger = useLogger();
 
+    options._paths = {
+      root: nuxt.options.rootDir,
+    };
+    options._layers = nuxt.options._layers;
+
     nuxt.hook("modules:done", () => {
       if (!hasNuxtModule("@nuxtjs/i18n", nuxt)) {
         logger.error(
@@ -68,26 +74,28 @@ export default defineNuxtModule<ModuleOptions>({
       options,
     });
 
-    addTemplate({
-      filename: "i18n.mine.mjs",
-      write: true,
-      getContents: TemplateGenerator,
-      options,
-    });
+    // addTemplate({
+    //   filename: "i18n.mine.mjs",
+    //   write: true,
+    //   getContents: TemplateGenerator,
+    //   options,
+    // });
 
-    addImportsDir("./runtime/composables");
+    const composables = resolver.resolve("./runtime/composables");
+    addImports([{ from: composables, name: "defineProjectLocale" }]);
+    // addImportsDir("./runtime/composables");
 
-    nuxt.hook("app:templates", () => {
-      console.log("app:templates");
-    });
+    // nuxt.hook("app:templates", () => {
+    //   console.log("app:templates");
+    // });
 
-    nuxt.hook("app:templatesGenerated", () => {
-      console.log("app:templatesGenerated");
-    });
+    // nuxt.hook("app:templatesGenerated", () => {
+    //   console.log("app:templatesGenerated");
+    // });
 
-    nuxt.hook("builder:watch", () => {
-      console.log("builder:watch");
-    });
+    // nuxt.hook("builder:watch", () => {
+    //   console.log("builder:watch");
+    // });
 
     // @ts-ignore stfu
     nuxt.hook("i18n:registerModule", async (register) => {
@@ -114,5 +122,3 @@ export default defineNuxtModule<ModuleOptions>({
     });
   },
 });
-
-export { defineProjectLocale } from "./runtime/composables/defineProjectLocale";
