@@ -1,6 +1,6 @@
 {
   "name": "nuxt-i18n-auto-config",
-  "version": "1.1.36",
+  "version": "1.1.37",
   "description": "A Nuxt module to simplify i18n locale definitions.",
   "repository": "https://github.com/BlueBazze/nuxt-i18n-auto-config",
   "license": "MIT",
