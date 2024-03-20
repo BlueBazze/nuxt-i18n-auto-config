@@ -9,11 +9,14 @@
     <br />
     <br />
     <CurrencyDisplay />
+    <br />
+    {{ localeProperties }}
   </div>
+
 </template>
 
 <script setup>
-const { messages,locale } = useI18n();
+const { messages,locale,localeProperties } = useI18n();
 </script>
 
 <style>

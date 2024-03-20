@@ -25,6 +25,10 @@ import {
 
 // Module options TypeScript interface definition
 
+declare module "@nuxt/schema" {
+}
+
+// @ts-ignore
 export default defineNuxtModule<ModuleOptions>({
   meta: {
     name: "nuxt-i18n-auto-config",
@@ -52,7 +56,6 @@ export default defineNuxtModule<ModuleOptions>({
     options._paths = {
       root: nuxt.options.rootDir,
     };
-    options._layers = nuxt.options._layers;
 
     nuxt.hook("modules:done", () => {
       if (!hasNuxtModule("@nuxtjs/i18n", nuxt)) {
@@ -80,21 +83,27 @@ export default defineNuxtModule<ModuleOptions>({
     //   options,
     // });
 
+    // @ts-ignore
     addTemplate({
       filename: "./locale/defineProjectLocale.mjs",
       write: true,
+      // @ts-ignore
       getContents: codegenTypeCodeTemplate,
       options,
     });
+    // @ts-ignore
     addTemplate({
       filename: "./locale/locales.json",
       write: true,
+      // @ts-ignore
       getContents: codegenLocaleTemplate,
       options,
     });
+    // @ts-ignore
     addTypeTemplate({
       filename: "./locale/defineProjectLocale.d.ts",
       write: true,
+      // @ts-ignore
       getContents: codegenTypesTemplate,
       options,
     });

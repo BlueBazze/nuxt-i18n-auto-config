@@ -1,7 +1,7 @@
-// import locales from "#build/locale/locales.json";
+import locales from "./.nuxt/locale/locales.json";
 
 export default defineNuxtConfig({
-  modules: ["../src/module", "@nuxtjs/i18n"],
+  modules: ["@nuxtjs/i18n", "../src/module"],
 
   devtools: {
     enabled: true,
@@ -22,24 +22,24 @@ export default defineNuxtConfig({
     },
   },
 
-  // i18n: {
-  //   defaultLocale: "en",
-  //   strategy: "prefix_except_default",
-  //   baseUrl: "https://google.com",
-  //   detectBrowserLanguage: {
-  //     useCookie: true,
-  //     cookieKey: "i18n_redirected",
-  //     redirectOn: "root", // recommended
-  //   },
-  //   debug: false,
-  //   lazy: true,
-  //   langDir: "./locales/",
-  //   vueI18n: "i18n.options.ts",
-  //   locales: locales,
-  //   // i18nModules:
-  //   // locales: Locales,
-  //   // locales: [
-  //   //   {}
-  //   // ]
-  // },
+  i18n: {
+    defaultLocale: "en",
+    strategy: "prefix_except_default",
+    baseUrl: "https://google.com",
+    detectBrowserLanguage: {
+      useCookie: true,
+      cookieKey: "i18n_redirected",
+      redirectOn: "root", // recommended
+    },
+    debug: false,
+    lazy: true,
+    langDir: "./locales/",
+    vueI18n: "i18n.options.ts",
+    locales: Object.values(locales).map((locale) => locale.locale),
+    // i18nModules:
+    // locales: Locales,
+    // locales: [
+    //   {}
+    // ]
+  },
 });

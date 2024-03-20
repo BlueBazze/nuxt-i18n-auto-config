@@ -67,12 +67,12 @@ export function defineProjectLocale(data: {
 }  `;
 }
 
-export function codegenTypeCodeTemplate(data: {
+export async function codegenTypeCodeTemplate(data: {
   nuxt: Nuxt;
   app: NuxtApp;
   options: ModuleOptions;
-}): string {
-  return `export function defineProjectLocale(data) {
+}): Promise<string> {
+  return  `export function defineProjectLocale(data) {
   return data;
 }
 `;

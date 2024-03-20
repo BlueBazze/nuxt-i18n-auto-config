@@ -1,6 +1,18 @@
 # Changelog
 
 
+## v1.1.19
+
+[compare changes](https://github.com/BlueBazze/nuxt-i18n-auto-config/compare/v1.1.18...v1.1.19)
+
+### 🏡 Chore
+
+- **release:** V1.1.18 ([c9cd521](https://github.com/BlueBazze/nuxt-i18n-auto-config/commit/c9cd521))
+
+### ❤️ Contributors
+
+- Tobias Jensen <bluebazze@gmail.com>
+
 ## v1.1.18
 
 [compare changes](https://github.com/BlueBazze/nuxt-i18n-auto-config/compare/v1.1.17...v1.1.18)
