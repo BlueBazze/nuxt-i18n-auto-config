@@ -72,7 +72,7 @@ export async function codegenTypeCodeTemplate(data: {
   app: NuxtApp;
   options: ModuleOptions;
 }): Promise<string> {
-  return  `export function defineProjectLocale(data) {
+  return `export function defineProjectLocale(data) {
   return data;
 }
 `;
@@ -83,9 +83,10 @@ export async function codegenLocaleTemplate(data: {
   app: NuxtApp;
   options: ModuleOptions;
 }): Promise<string> {
-  let locales: { [key: string]: ProjectLocale } = {};
+  const locales: { [layer: string]: { [key: string]: ProjectLocale } } = {};
 
   for (const layer of data.nuxt.options._layers || []) {
+    console.log("Layer", layer);
     const resolve = createResolver(layer.cwd);
 
     const _localeFiles = await getFilesInPath(
@@ -97,14 +98,23 @@ export async function codegenLocaleTemplate(data: {
       });
     });
 
-    locales = (await Promise.all(_localeFiles))
+    locales[layer.cwd] = (await Promise.all(_localeFiles))
       .map((locale: ProjectLocale) => ({ [locale.locale.code]: locale }))
       .reduce((a, b) => ({ ...a, ...b }), {});
 
-    locales = await getTranslationFilesList(layer.cwd, locales, data.options);
+    locales[layer.cwd] = await getTranslationFilesList(
+      layer.cwd,
+      locales[layer.cwd],
+      data.options
+    );
   }
+  Object.values(locales);
 
-  return JSON.stringify(locales, null, 2);
+  return JSON.stringify(
+    Object.values(locales).map((layer) => layer).reduce((a, b) => ({ ...a, ...b })),
+    null,
+    2
+  );
 }
 
 async function ImportFile(absolutePath: string, resolve: Resolver) {
