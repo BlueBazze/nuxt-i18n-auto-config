@@ -19,9 +19,9 @@ export interface ComputedLocaleObject extends LocaleObject {
 export interface ProjectLocale {
   locale: LocaleObject;
   // @ts-ignore
-  datetimeFormats: import("#build/i18n.auto-config.d.ts").DatetimeFormats;
+  datetimeFormats: import("#build/locale/auto.d.ts").DatetimeFormats;
   // @ts-ignore
-  numberFormats: import("#build/i18n.auto-config.d.ts").NumberFormats;
+  numberFormats: import("#build/locale/auto.d.ts").NumberFormats;
 }
 
 // const ll: ProjectLocale = {

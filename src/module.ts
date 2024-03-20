@@ -7,6 +7,7 @@ import {
   addTypeTemplate,
   addImportsDir,
   addImports,
+  updateTemplates,
 } from "@nuxt/kit";
 import {
   GenerateTemplate,
@@ -16,6 +17,11 @@ import {
 } from "./loader";
 import type { ModuleOptions } from "./types";
 import { TemplateGenerator } from "./generator";
+import {
+  codegenLocaleTemplate,
+  codegenTypeCodeTemplate,
+  codegenTypesTemplate,
+} from "./codegen";
 
 // Module options TypeScript interface definition
 
@@ -56,22 +62,61 @@ export default defineNuxtModule<ModuleOptions>({
       }
     });
 
+    // addTemplate({
+    //   filename: "i18n.auto-config.mjs",
+    //   write: true,
+    //   getContents: GenerateTemplate,
+    //   options,
+    //   // getContents(data) {
+    //   //   console.log(Object.keys(data));
+    //   //   return "";
+    //   // },
+    // });
+
+    // addTypeTemplate({
+    //   filename: "i18n.auto-config.d.ts",
+    //   write: true,
+    //   getContents: GenerateTypeTemplate,
+    //   options,
+    // });
+
     addTemplate({
-      filename: "i18n.auto-config.mjs",
+      filename: "./locale/defineProjectLocale.mjs",
       write: true,
-      getContents: GenerateTemplate,
+      getContents: codegenTypeCodeTemplate,
       options,
-      // getContents(data) {
-      //   console.log(Object.keys(data));
-      //   return "";
-      // },
+    });
+    addTemplate({
+      filename: "./locale/locales.json",
+      write: true,
+      getContents: codegenLocaleTemplate,
+      options,
+    });
+    addTypeTemplate({
+      filename: "./locale/defineProjectLocale.d.ts",
+      write: true,
+      getContents: codegenTypesTemplate,
+      options,
     });
 
-    addTypeTemplate({
-      filename: "i18n.auto-config.d.ts",
-      write: true,
-      getContents: GenerateTypeTemplate,
-      options,
+    nuxt.hook("builder:watch", async (event, relativePath) => {
+      console.log("Builder change");
+      if (event == "change") return;
+
+      const path = resolver.resolve(nuxt.options.srcDir, relativePath);
+      console.log({ path });
+      if (
+        ["locales/definitions", "locales/translations"].some((dir) =>
+          path.startsWith(dir)
+        )
+      ) {
+        console.log("REBUILDING LOCALES");
+        await updateTemplates({
+          filter: (template) =>
+            template.filename === "locales.json" ||
+            template.filename === "defineProjectLocale.d.ts",
+        });
+      }
     });
 
     // addTemplate({

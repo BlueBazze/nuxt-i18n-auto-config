@@ -20,6 +20,8 @@ import {
 } from "./utils/fs";
 import { join, relative, basename } from "pathe";
 import type { LocaleObject } from "@nuxtjs/i18n/dist/runtime/composables";
+import { addTemplate, createResolver } from "@nuxt/kit";
+import { pathToFileURL } from "url";
 
 export async function loadLocales(options: ModuleOptions) {
   const localeFiles = await getFilesInPath(
@@ -77,6 +79,17 @@ export async function GenerateTemplate(data: {
       "*.ts"
     );
 
+    new Promise(async (r) => {
+      const resolve = createResolver(layer.cwd);
+
+      const resolved = pathToFileURL(resolve.resolve(_localeFiles[0] || ""));
+
+      const content = await import(resolved.href);
+      console.log({ content });
+
+      r(resolved);
+    });
+
     if (_localeFiles.length > 0) {
       _localeFiles.forEach((file) => {
         // If filename already exists dont append it
@@ -106,7 +119,7 @@ export async function GenerateTemplate(data: {
       data.options
     );
 
-    if(Object.keys(_layerLocales).length > 0) {
+    if (Object.keys(_layerLocales).length > 0) {
       Object.keys(_layerLocales).forEach((key) => {
         if (!locales[key]) {
           locales[key] = [];
@@ -115,7 +128,6 @@ export async function GenerateTemplate(data: {
       });
     }
   }
-  
 
   // localeFiles = await getFilesInPath(
   //   getLocaleDefinitionsPath(data.options),
@@ -151,7 +163,7 @@ ${Object.entries(localeFiles)
     return `${key}: () => import("${relative(
       data.nuxt.options.buildDir,
       value
-    )}")()`;
+    )}")`;
   })
   .join(",\n")}
 }
@@ -163,7 +175,7 @@ ${Object.entries(locales)
     return `
   {
     code: "${key}",
-    ...imports.${key},
+    ...imports.${key}(),
     files: [${value.map((file) => `"${file}"`).join(", ")}]
   }
   `;
