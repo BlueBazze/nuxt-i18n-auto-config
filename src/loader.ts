@@ -79,17 +79,6 @@ export async function GenerateTemplate(data: {
       "*.ts"
     );
 
-    new Promise(async (r) => {
-      const resolve = createResolver(layer.cwd);
-
-      const resolved = pathToFileURL(resolve.resolve(_localeFiles[0] || ""));
-
-      const content = await import(resolved.href);
-      console.log({ content });
-
-      r(resolved);
-    });
-
     if (_localeFiles.length > 0) {
       _localeFiles.forEach((file) => {
         // If filename already exists dont append it

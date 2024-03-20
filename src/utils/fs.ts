@@ -51,22 +51,7 @@ export async function getDefaultContentsOfFiles<T>(
 ): Promise<(FileContent<T> | T)[]> {
   const contents = await Promise.all(
     files.map(async (_file) => {
-      const { default: content } = await import(_file).catch((e) => {
-        console.error("Error reading file", _file, e);
-
-        // Try importing the typescript file into this js file
-        // @ts-ignore
-        const code = readCode(_file, ".ts");
-        // @ts-ignore
-        const parsed = ParseCode(code, {
-          allowImportExportEverywhere: true,
-          sourceType: "module",
-        });
-
-        // return evaluated code as a mask for import/export
-        // @ts-ignore
-        return eval(code);
-      });
+      const { default: content } = await import(_file);
       return withPath ? { content, path: _file } : content;
     })
   );
