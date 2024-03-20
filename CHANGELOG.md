@@ -1,6 +1,10 @@
 # Changelog
 
 
+## v1.1.23
+
+[compare changes](https://github.com/BlueBazze/nuxt-i18n-auto-config/compare/v1.1.22...v1.1.23)
+
 ## v1.1.22
 
 [compare changes](https://github.com/BlueBazze/nuxt-i18n-auto-config/compare/v1.1.21...v1.1.22)
