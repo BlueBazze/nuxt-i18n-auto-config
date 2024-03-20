@@ -18,6 +18,7 @@ import {
 import type { ModuleOptions } from "./types";
 import { TemplateGenerator } from "./generator";
 import {
+  codegenLocaleFilesTemplate,
   codegenLocaleTemplate,
   codegenTypeCodeTemplate,
   codegenTypesTemplate,
@@ -25,8 +26,7 @@ import {
 
 // Module options TypeScript interface definition
 
-declare module "@nuxt/schema" {
-}
+declare module "@nuxt/schema" {}
 
 // @ts-ignore
 export default defineNuxtModule<ModuleOptions>({
@@ -41,11 +41,12 @@ export default defineNuxtModule<ModuleOptions>({
   // Default configuration options of the Nuxt module
   defaults: {
     paths: {
-      localeDefinitionsPath: "config/locales",
-      localesPath: "locales",
+      localeDefinitionsPath: "locales/definitions",
+      localesPath: "locales/translations",
     },
     expressions: {
       localeDefinition: "{localeDefinitionsPath}/",
+      localesPath: "{localesPath}/",
       locales: "{localesPath}/{locale}/",
     },
   },
@@ -84,42 +85,39 @@ export default defineNuxtModule<ModuleOptions>({
     // });
 
     // @ts-ignore
+    // addTemplate({
+    //   filename: "./locale/defineProjectLocale.mjs",
+    //   write: true,
+    //   // @ts-ignore
+    //   getContents: codegenTypeCodeTemplate,
+    //   options,
+    // });
+    // @ts-ignore
     addTemplate({
-      filename: "./locale/defineProjectLocale.mjs",
+      filename: "./locale/localeFiles.json",
       write: true,
       // @ts-ignore
-      getContents: codegenTypeCodeTemplate,
+      getContents: codegenLocaleFilesTemplate,
       options,
     });
     // @ts-ignore
-    addTemplate({
-      filename: "./locale/locales.json",
-      write: true,
-      // @ts-ignore
-      getContents: codegenLocaleTemplate,
-      options,
-    });
-    // @ts-ignore
-    addTypeTemplate({
-      filename: "./locale/defineProjectLocale.d.ts",
-      write: true,
-      // @ts-ignore
-      getContents: codegenTypesTemplate,
-      options,
-    });
+    // addTypeTemplate({
+    //   filename: "./locale/defineProjectLocale.d.ts",
+    //   write: true,
+    //   // @ts-ignore
+    //   getContents: codegenTypesTemplate,
+    //   options,
+    // });
 
     nuxt.hook("builder:watch", async (event, relativePath) => {
-      console.log("Builder change");
       if (event == "change") return;
 
       const path = resolver.resolve(nuxt.options.srcDir, relativePath);
-      console.log({ path });
       if (
         ["locales/definitions", "locales/translations"].some((dir) =>
           path.startsWith(dir)
         )
       ) {
-        console.log("REBUILDING LOCALES");
         await updateTemplates({
           filter: (template) =>
             template.filename === "locales.json" ||

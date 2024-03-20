@@ -94,6 +94,22 @@ export function getLocaleDefinitionsPath(
   });
 }
 
+export function getTranslationRootPath(
+  cwd: string,
+  options: ModuleOptions
+): string {
+  return pathFiller(options.expressions.localesPath, [
+    {
+      exp: PATH_LOCALE_DEFINITION_PATH_MATCHER,
+      value: join(cwd, options.paths.localeDefinitionsPath),
+    },
+    {
+      exp: PATH_LOCALES_PATH_MATCHER,
+      value: join(cwd, options.paths.localesPath),
+    }
+  ]);
+}
+
 export function getTranslationFilesPath(
   code: string,
   cwd: string,

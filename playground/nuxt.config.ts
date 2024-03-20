@@ -22,24 +22,24 @@ export default defineNuxtConfig({
     },
   },
 
-  i18n: {
-    defaultLocale: "en",
-    strategy: "prefix_except_default",
-    baseUrl: "https://google.com",
-    detectBrowserLanguage: {
-      useCookie: true,
-      cookieKey: "i18n_redirected",
-      redirectOn: "root", // recommended
-    },
-    debug: false,
-    lazy: true,
-    langDir: "./locales/",
-    vueI18n: "i18n.options.ts",
-    locales: Object.values(locales).map((locale) => locale.locale),
-    // i18nModules:
-    // locales: Locales,
-    // locales: [
-    //   {}
-    // ]
-  },
+  // i18n: {
+  //   defaultLocale: "en",
+  //   strategy: "prefix_except_default",
+  //   baseUrl: "https://google.com",
+  //   detectBrowserLanguage: {
+  //     useCookie: true,
+  //     cookieKey: "i18n_redirected",
+  //     redirectOn: "root", // recommended
+  //   },
+  //   debug: false,
+  //   lazy: true,
+  //   langDir: "./locales/",
+  //   vueI18n: "i18n.options.ts",
+  //   locales: Object.values(locales).map((locale) => locale.locale),
+  //   // i18nModules:
+  //   // locales: Locales,
+  //   // locales: [
+  //   //   {}
+  //   // ]
+  // },
 });

@@ -14,5 +14,6 @@ export interface ModuleOptions {
   expressions: {
     localeDefinition: string;
     locales: string;
+    localesPath: string;
   };
 }
